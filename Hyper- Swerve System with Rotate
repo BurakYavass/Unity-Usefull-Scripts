@@ -1,0 +1,82 @@
+    [SerializeField] private float _vSpeed;
+    [SerializeField] private float _hSpeed;
+    [SerializeField] public float _rotateSpeed;
+   
+    // if you want to rotate your Child Object 
+    [SerializeField]private GameObject _childGameObject;
+    
+    private float directionY;
+    private float yDiff;
+    private Vector3 firstPos, endPos;
+
+    public bool isSpinning = false;
+    
+    void Start()
+    {
+        DOTween.Init();
+    }
+    public void VSpeedChanger(int vspeed)
+    {
+        _vSpeed = vspeed;
+    }
+
+    public void RotateSpeedChanger(float rotatespeed)
+    {
+        _rotateSpeed = rotatespeed;
+    }
+
+    public void HorizontalSpeedChanger(float horizontalspeed)
+    {
+        _hSpeed = horizontalspeed;
+    }
+    
+    void Update()
+    {
+        Vector3 clampedPosition = transform.position;
+
+        clampedPosition.x = Mathf.Clamp(clampedPosition.x, -8f, 8f);
+        transform.position = clampedPosition;
+        
+        MousePosition();
+        
+        transform.position += Vector3.forward * _vSpeed * Time.deltaTime;
+        
+    }
+
+    void MousePosition()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            firstPos = Input.mousePosition;
+            isSpinning = true;
+            _childGameObject.transform.DOKill();
+            
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            endPos = Input.mousePosition;
+            
+            _childGameObject.transform.DOKill();
+            _childGameObject.transform.DOLocalRotate(new Vector3(0, -360, 0), 0.5f*_rotateSpeed,RotateMode.FastBeyond360)
+                                                                                  .SetLoops(-1,LoopType.Restart).SetEase(Ease.Linear);
+
+            float xDiff = endPos.x - firstPos.x;
+            transform.Translate(xDiff*Time.deltaTime * _hSpeed/100, 0, 0);
+
+        }
+        if(Input.GetMouseButtonUp(0))
+        {
+            _childGameObject.transform.DOKill();
+
+            isSpinning = false;
+
+            firstPos = Vector3.zero;
+            endPos = Vector3.zero;
+        }
+        else if (!Input.GetMouseButton(0))
+        {
+            _childGameObject.transform.DOKill();
+            _childGameObject.transform.localRotation = Quaternion.Euler(0f,0f,0f);
+        }
+          
+    }
