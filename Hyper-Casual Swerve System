@@ -1,0 +1,50 @@
+    [SerializeField] private float _vSpeed;
+    [SerializeField] private float _hSpeed;
+    
+    private float yDiff;
+    private Vector3 firstPos, endPos;
+   
+    public void VSpeedChanger(int vspeed)
+    {
+        _vSpeed = vspeed;
+    }
+
+    public void HorizontalSpeedChanger(float horizontalspeed)
+    {
+        _hSpeed = horizontalspeed;
+    }
+    
+    void Update()
+    {
+        Vector3 clampedPosition = transform.position;
+
+        clampedPosition.x = Mathf.Clamp(clampedPosition.x, -8f, 8f);
+        transform.position = clampedPosition;
+        
+        transform.position += Vector3.forward * _vSpeed * Time.deltaTime;
+        
+        MousePosition();
+     
+    }
+
+    void MousePosition()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            firstPos = Input.mousePosition; 
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            endPos = Input.mousePosition;
+
+            float xDiff = endPos.x - firstPos.x;
+            transform.Translate(xDiff*Time.deltaTime * _hSpeed/100, 0, 0);
+
+        }
+        if(Input.GetMouseButtonUp(0))
+        {
+            firstPos = Vector3.zero;
+            endPos = Vector3.zero;
+        }
+          
+    }
